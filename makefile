@@ -1,2 +1,8 @@
-default:
-	g++ src/*.cpp -Wall -Wextra -O1 -o A_star `pkg-config --libs --cflags sdl2 SDL2_image SDL2_ttf` -fsanitize=address,undefined
+CC=g++
+PKG=sdl2 SDL2_image SDL2_ttf
+CFLAGS=-Wall -Wextra -O1 `pkg-config --cflags $(PKG)`
+LIBS=`pkg-config --libs $(PKG)`
+SRC=src/main.cpp src/Button.cpp src/Grid.cpp src/a-star.cpp
+
+A_start: $(SRC)
+	g++ -o A_star $(SRC) $(CFLAGS) $(LIBS)

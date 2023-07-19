@@ -1,37 +1,32 @@
 #include "Button.h"
-Button::Button(std::string msg, SDL_Renderer* screen, int x, int y) : Object{ x, y }, text{ msg } {
+#include "utils.h"
 
-    TTF_Font* Sans = TTF_OpenFont("resources/iosevka-regular.ttf", 24);
-    if (Sans == NULL)
-        Error(TTF_GetError());
-    SDL_Color Black = { 0, 0, 0, 255};
+template<typename T>
+T* check(T* data);
+void check(int data);
 
+Button::Button(const char* msg, TTF_Font* font, SDL_Renderer* screen, int x, int y): text{ msg } {
 
-    SDL_Surface* s = TTF_RenderText_Solid(Sans, msg.c_str(), Black);
-    if (s == NULL)
-        Error(SDL_GetError());
-    rectDst.w = s->w;
-    rectDst.h = s->h;
+    SDL_Surface* s = check(TTF_RenderText_Solid(font,  msg, SDL_Color{ 0, 0, 0, 255 }));
 
-    SDL_Surface* background = SDL_CreateRGBSurface(0, s->w, s->h, 32, 0, 0, 0, 0);
-    if (background == NULL)
-        Error(SDL_GetError());
+    bound.x = x;
+    bound.y = y;
+    bound.w = s->w;
+    bound.h = s->h;
 
-    SDL_FillRect(background, NULL, SDL_MapRGB(background->format, 255, 0, 0));
-    SDL_BlitSurface(s, NULL, background, NULL);
+    SDL_Surface* background = check(SDL_CreateRGBSurface(0, s->w, s->h, 32, 0, 0, 0, 0));
+    check(SDL_FillRect(background, NULL, SDL_MapRGB(background->format, 255, 0, 0)));
+    check(SDL_BlitSurface(s, NULL, background, NULL));
 
-    texture = SDL_CreateTextureFromSurface(screen, background);
-    if (texture == NULL)
-        Error(SDL_GetError());
+    texture = check(SDL_CreateTextureFromSurface(screen, background));
 
     SDL_FreeSurface(background);
     SDL_FreeSurface(s);
-    TTF_CloseFont(Sans);
 }
 
-bool Button::isClicked(Position pos) {
-    if (pos.y >= rectDst.y && pos.y < rectDst.y + rectDst.h &&
-        pos.x >= rectDst.x && pos.x < rectDst.x + rectDst.w)
+bool Button::isClicked(Vec2i pos) {
+    if (pos.y >= bound.y && pos.y < bound.y + bound.h &&
+        pos.x >= bound.x && pos.x < bound.x + bound.w)
         return true;
     return false;
 }

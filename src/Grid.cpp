@@ -1,29 +1,21 @@
 #include <fstream>
 #include "Grid.h"
 
-Grid::Grid(int rows, int cols, SDL_Renderer* screen) : MAXROWS{ rows }, MAXCOLUMNS{ cols } {
-    grid = new Cell * [MAXROWS];
-    for (int i = 0; i < MAXROWS; i++) {
-        grid[i] = new Cell[MAXCOLUMNS];
-        for (int j = 0; j < MAXCOLUMNS; j++)
-            if (grid[i][j].initGraphic(screen) == false)
-                exit(1);
-    }
-}
-
-Grid::~Grid() {
-    for (int i = 0; i < MAXROWS; i++)
-        delete[] grid[i];
-    delete[] grid;
+Grid::Grid(size_t rows, size_t cols) : MAXROWS{ rows }, MAXCOLUMNS{ cols }, position{} {
+    grid = new State [MAXROWS * MAXCOLUMNS];
+    memset(grid, 0, MAXROWS * MAXCOLUMNS * sizeof(grid[0]));
 }
 
 void Grid::saveToFile(const char* fName) {
     std::ofstream fout(fName, std::ios::out);
     if (!fout)
         throw "Can't open file to save";
-    for (int i = 0; i < MAXROWS; i++)
-        for (int j = 0; j < MAXCOLUMNS; j++)
-            fout << grid[i][j].getWalkable() << " ";
+    for (size_t i = 0; i < MAXROWS; i++) {
+        for (size_t j = 0; j < MAXCOLUMNS; j++) {
+            int state = at(i, j) == Unwalkable ? Unwalkable : Walkable;
+            fout << state << " ";
+        }
+    }
     fout.close();
 }
 
@@ -31,39 +23,50 @@ void Grid::readFromFile(const char* fName) {
     std::ifstream fin(fName, std::ios::in);
     if (!fin)
         throw "Can't open file to read";
-    for (int i = 0; i < MAXROWS; i++)
-        for (int j = 0; j < MAXROWS; j++) {
-            bool w = false;
+    for (size_t i = 0; i < MAXROWS; i++)
+        for (size_t j = 0; j < MAXROWS; j++) {
+            int w = false;
             fin >> w;
-            grid[i][j].setWalkable(w);
+            at(i, j) = (State)w;
         }
     fin.close();
 }
 
-void Grid::draw(SDL_Renderer* screen) {
-    for (int i = 0; i < MAXROWS; i++)
-        for (int j = 0; j < MAXCOLUMNS; j++)
-            grid[i][j].draw({ j * Cell::SIZE, i * Cell::SIZE }, screen);
+void Grid::draw(SDL_Renderer* renderer) {
+    check(SDL_SetRenderDrawColor(renderer, UNHEX(uint8_t, OUTLINE_COLOR)));
+    const SDL_Rect outline {
+        .x = position.x,
+        .y = position.y,
+        .w = (int)pxWidth(),
+        .h = (int)pxHeight(),
+    };
+    check(SDL_RenderFillRect(renderer, &outline));
+    for (size_t i = 0; i < MAXROWS; i++) {
+        for (size_t j = 0; j < MAXCOLUMNS; j++) {
+            const SDL_Rect rect {
+                .x = (int)(j * CELLSIZE + PADDING + position.x),
+                .y = (int)(i * CELLSIZE + PADDING + position.y),
+                .w = (int)(CELLSIZE - 2 * PADDING),
+                .h = (int)(CELLSIZE - 2 * PADDING),
+            };
+            check(SDL_SetRenderDrawColor(renderer, UNHEX(uint8_t, stateColor[at(i, j)])));
+            check(SDL_RenderFillRect(renderer,
+                    &rect));
+        }
+    }
 }
 
-Position Grid::pointToGridCell(Position pos) {
-    SDL_GetMouseState(&pos.x, &pos.y);
-    pos.x /= Cell::SIZE;
-    pos.y /= Cell::SIZE;
+Vec2i Grid::pointToGridCell(Vec2i pos) {
+    pos = pos - position;
+    pos.x /= CELLSIZE;
+    pos.y /= CELLSIZE;
     return pos;
 }
 
 void Grid::clear() {
-    for (int i = 0; i < MAXROWS; i++)
-        for (int j = 0; j < MAXCOLUMNS; j++) {
-            grid[i][j].setState(Unselected);
-            grid[i][j].setWalkable(true);
-            grid[i][j].setVal(INT32_MAX);
+    for (size_t i = 0; i < MAXROWS; i++) {
+        for (size_t j = 0; j < MAXCOLUMNS; j++) {
+            at(i, j) = Walkable;
         }
-}
-
-void Grid::setCellWalkable(Position p, bool walkable) {
-    if (!isValidPosition(p))
-        Error("Invalid position");
-    grid[p.y][p.x].setWalkable(walkable);
+    }
 }
