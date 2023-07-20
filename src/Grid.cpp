@@ -10,11 +10,9 @@ void Grid::saveToFile(const char* fName) {
     std::ofstream fout(fName, std::ios::out);
     if (!fout)
         throw "Can't open file to save";
-    for (size_t i = 0; i < MAXROWS; i++) {
-        for (size_t j = 0; j < MAXCOLUMNS; j++) {
-            int state = at(i, j) == Unwalkable ? Unwalkable : Walkable;
-            fout << state << " ";
-        }
+    for (size_t i = 0; i < MAXROWS * MAXCOLUMNS; i++) {
+        int state = grid[i] == Unwalkable ? Unwalkable : Walkable;
+        fout << state << " ";
     }
     fout.close();
 }
@@ -23,12 +21,11 @@ void Grid::readFromFile(const char* fName) {
     std::ifstream fin(fName, std::ios::in);
     if (!fin)
         throw "Can't open file to read";
-    for (size_t i = 0; i < MAXROWS; i++)
-        for (size_t j = 0; j < MAXROWS; j++) {
-            int w = false;
-            fin >> w;
-            at(i, j) = (State)w;
-        }
+    for (size_t i = 0; i < MAXROWS * MAXCOLUMNS; i++) {
+        int w = false;
+        fin >> w;
+        grid[i] = (State)w;
+    }
     fin.close();
 }
 
@@ -63,10 +60,14 @@ Vec2i Grid::pointToGridCell(Vec2i pos) {
     return pos;
 }
 
+void Grid::clearPath() {
+    for (size_t i = 0; i < MAXROWS*MAXCOLUMNS; i++) {
+        if (grid[i] == Selected || grid[i] == Corrected) grid[i] = Walkable;
+    }
+}
+
 void Grid::clear() {
-    for (size_t i = 0; i < MAXROWS; i++) {
-        for (size_t j = 0; j < MAXCOLUMNS; j++) {
-            at(i, j) = Walkable;
-        }
+    for (size_t i = 0; i < MAXROWS*MAXCOLUMNS; i++) {
+        grid[i] = Walkable;
     }
 }

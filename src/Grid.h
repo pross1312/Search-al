@@ -5,10 +5,6 @@
 
 
 #define MAX_CELL_SIZE 32
-#define UNHEX(type, c) (type)((uint8_t)((c) >> 8 * 3) & (uint8_t)0xff)\
-                      ,(type)((uint8_t)((c) >> 8 * 2) & (uint8_t)0xff)\
-                      ,(type)((uint8_t)((c) >> 8)     & (uint8_t)0xff)\
-                      ,(type)((uint8_t)((c))          & (uint8_t)0xff)
 
 enum State {
     Walkable = 0,
@@ -38,6 +34,7 @@ public:
     Vec2i pointToGridCell(Vec2i pos);
     bool isValidPosition(Vec2i p) { return p.x >= 0 && p.y >= 0 && (size_t)p.x < MAXCOLUMNS && (size_t)p.y < MAXROWS; }
     void clear();
+    void clearPath();
     void draw(SDL_Renderer* renderer);
     void saveToFile(const char* fName);
     void readFromFile(const char* fName);

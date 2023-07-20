@@ -5,28 +5,49 @@ template<typename T>
 T* check(T* data);
 void check(int data);
 
-Button::Button(const char* msg, TTF_Font* font, SDL_Renderer* screen, int x, int y): text{ msg } {
-
-    SDL_Surface* s = check(TTF_RenderText_Solid(font,  msg, SDL_Color{ 0, 0, 0, 255 }));
+Button::Button(const char* msg, TTF_Font* font, SDL_Renderer* renderer, int x, int y, std::function<void()> onClickedEvent):
+    text{ msg },
+    currentColor{ BUTTON_NORMAL_COLOR },
+    onClickedEvent{ onClickedEvent } {
+    currentColor = BUTTON_NORMAL_COLOR;
+    SDL_Surface* text = check(TTF_RenderText_Solid(font,  msg, SDL_Color{UNHEX(uint8_t, BUTTON_TEXT_COLOR)}));
 
     bound.x = x;
     bound.y = y;
-    bound.w = s->w;
-    bound.h = s->h;
+    bound.w = text->w + BUTTON_PADDING*2;
+    bound.h = text->h + BUTTON_PADDING*2;
 
-    SDL_Surface* background = check(SDL_CreateRGBSurface(0, s->w, s->h, 32, 0, 0, 0, 0));
-    check(SDL_FillRect(background, NULL, SDL_MapRGB(background->format, 255, 0, 0)));
-    check(SDL_BlitSurface(s, NULL, background, NULL));
-
-    texture = check(SDL_CreateTextureFromSurface(screen, background));
-
-    SDL_FreeSurface(background);
-    SDL_FreeSurface(s);
+    texture = check(SDL_CreateTextureFromSurface(renderer, text));
+    SDL_FreeSurface(text);
 }
 
-bool Button::isClicked(Vec2i pos) {
+void Button::draw(SDL_Renderer* renderer) {
+    check(SDL_SetRenderDrawColor(renderer, UNHEX(uint8_t, currentColor)));
+    check(SDL_RenderFillRect(renderer, &bound));
+    SDL_Rect dst {
+        .x = bound.x + BUTTON_PADDING,
+        .y = bound.y + BUTTON_PADDING,
+        .w = bound.w - BUTTON_PADDING*2,
+        .h = bound.h - BUTTON_PADDING*2,
+    };
+    check(SDL_RenderCopy(renderer, texture, nullptr, &dst));
+}
+
+bool Button::isInBound(Vec2i pos) {
     if (pos.y >= bound.y && pos.y < bound.y + bound.h &&
         pos.x >= bound.x && pos.x < bound.x + bound.w)
         return true;
     return false;
+}
+
+void Button::update(SDL_Event& event, Vec2i mousePos) {
+    if (isInBound(mousePos)) {
+        currentColor = BUTTON_ON_HOVER_COLOR;
+        if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
+            onClickedEvent();
+            currentColor = BUTTON_CLICKED_COLOR;
+        }
+    } else {
+        currentColor = BUTTON_NORMAL_COLOR;
+    }
 }

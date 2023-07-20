@@ -32,11 +32,24 @@ int main(void)
     bool quit = false;
     bool on_left_mouse_click = false;
     bool on_right_mouse_click = false;
-    AStarFinder finder;
+
+    const char* fontPath = "iosevka-term-regular.ttf";
+    TTF_Font* font = check(TTF_OpenFont(fontPath, 24));
+
+    Button buttons[] = {
+        Button("Reset", font, renderer, grid.pxWidth() + 100, 50, [&grid]() { grid.clear(); }),
+        Button("Clear path", font, renderer, grid.pxWidth() + 200, 50, [&grid]() { grid.clearPath(); }),
+        Button("AStart", font, renderer, grid.pxWidth() + 100, 150, [&grid]() {
+            AStarFinder finder;
+            finder.find(&grid, Vec2i{0, 0}, Vec2i{(int)grid.MAXCOLUMNS-1, (int)grid.MAXROWS-1});
+        }),
+    };
     while (!quit) {
+        Uint64 start = SDL_GetPerformanceCounter();
         Vec2i mousePos;
         SDL_GetMouseState(&mousePos.x, &mousePos.y);
         while (SDL_PollEvent(&event) != 0) {
+            for (auto& b : buttons) b.update(event, mousePos);
             switch (event.type) {
             case SDL_QUIT:
                 quit = true;
@@ -57,11 +70,6 @@ int main(void)
                 if (event.button.button == SDL_BUTTON_LEFT) on_left_mouse_click = false;
                 else if (event.button.button == SDL_BUTTON_RIGHT) on_right_mouse_click = false;
                 break;
-            case SDL_KEYDOWN:
-                if (event.key.keysym.sym == SDLK_a) {
-                    finder.find(&grid, Vec2i{0, 0}, Vec2i{(int)grid.MAXCOLUMNS-1, (int)grid.MAXROWS-1});
-                }
-                break;
             }
         }
         if (on_left_mouse_click || on_right_mouse_click) {
@@ -71,7 +79,21 @@ int main(void)
         check(SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255));
         check(SDL_RenderClear(renderer));
         grid.draw(renderer);
+        for (auto& b : buttons) b.draw(renderer);
+
+        float elapsedMS = (end - start);
+        // Cap to 60 FPS
+        printf("%f\n", elapsedMS);
+        SDL_Surface* text = check(TTF_RenderText_Solid(font, std::to_string(1.0f / elapsedMS).c_str(), SDL_Color{UNHEX(uint8_t, BUTTON_TEXT_COLOR)}));
+        SDL_Rect dst = {
+            .x = 1500,
+            .y = 700,
+            .w = text->w,
+            .h = text->h
+        };
+        SDL_RenderCopy(renderer, check(SDL_CreateTextureFromSurface(renderer, text)), NULL, &dst);
         SDL_RenderPresent(renderer);
+        SDL_FreeSurface(text);
     }
     return 0;
 }
