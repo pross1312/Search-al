@@ -1,24 +1,26 @@
 #include "Button.h"
 #include "Grid.h"
+#include "widget-manager.h"
 #include "a-star.h"
 
-const int ROWS = 30;
-const int COLUMNS = 30;
 // Vec2i startPos = { 0, 0 };
 // Vec2i endPos = { ROWS-5, COLUMNS-5 };
 
-
+size_t S_WIDTH = 800;
+size_t S_HEIGHT = 700;
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 SDL_Event event;
 
 int main(void)
 {
-    Grid grid(ROWS, COLUMNS);
-    grid.position = {50, 50};
+    WidgetManager widgetManager(SDL_Rect{ .x = 0, .y = 0, .w = int(S_WIDTH), .h = int(S_HEIGHT) }, PortionHorizontal, {.8f, .2f});
 
-    size_t S_WIDTH = grid.pxWidth() + 100;
-    size_t S_HEIGHT = grid.pxHeight() + 100;
+    const int rows = 30;
+    const int columns = 30;
+    Grid grid(rows, columns);
+    widgetManager.add(&grid);
+
     check(SDL_Init(SDL_INIT_VIDEO));
     check(TTF_Init());
     window = check(SDL_CreateWindow("PATH",
@@ -32,20 +34,26 @@ int main(void)
     bool quit = false;
     bool on_left_mouse_click = false;
     bool on_right_mouse_click = false;
+    bool dirty = false;
 
     const char* fontPath = "iosevka-term-regular.ttf";
     TTF_Font* font = check(TTF_OpenFont(fontPath, 24));
 
+    WidgetManager buttonsManager(GridLayout, 4, 1);
+    widgetManager.add(&buttonsManager);
     Button buttons[] = {
-        Button("Reset", font, renderer, grid.pxWidth() + 100, 50, [&grid]() { grid.clear(); }),
-        Button("Clear path", font, renderer, grid.pxWidth() + 200, 50, [&grid]() { grid.clearPath(); }),
-        Button("AStart", font, renderer, grid.pxWidth() + 100, 150, [&grid]() {
+        Button("Reset", font, renderer, [&]() { grid.clear(); dirty = false; }),
+        Button("Clear path", font, renderer, [&]() { grid.clearPath(); dirty = false; }),
+        Button("AStart", font, renderer, [&]() {
+            if (dirty) return;
             AStarFinder finder;
             finder.find(&grid, Vec2i{0, 0}, Vec2i{(int)grid.MAXCOLUMNS-1, (int)grid.MAXROWS-1});
+            dirty = true;
         }),
     };
+    for (auto& b : buttons) buttonsManager.add(&b);
+
     while (!quit) {
-        Uint64 start = SDL_GetPerformanceCounter();
         Vec2i mousePos;
         SDL_GetMouseState(&mousePos.x, &mousePos.y);
         while (SDL_PollEvent(&event) != 0) {
@@ -55,7 +63,12 @@ int main(void)
                 quit = true;
                 break;
             case SDL_WINDOWEVENT:
-                  break;
+                if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+                    S_WIDTH = event.window.data1;
+                    S_HEIGHT = event.window.data2;
+                    widgetManager.setBound(SDL_Rect{ .x = 0, .y = 0, .w = int(S_WIDTH), .h = int(S_HEIGHT)});
+                }
+                break;
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.button == SDL_BUTTON_RIGHT) {
                     on_right_mouse_click = true;
@@ -78,22 +91,8 @@ int main(void)
         }
         check(SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255));
         check(SDL_RenderClear(renderer));
-        grid.draw(renderer);
-        for (auto& b : buttons) b.draw(renderer);
-
-        float elapsedMS = (end - start);
-        // Cap to 60 FPS
-        printf("%f\n", elapsedMS);
-        SDL_Surface* text = check(TTF_RenderText_Solid(font, std::to_string(1.0f / elapsedMS).c_str(), SDL_Color{UNHEX(uint8_t, BUTTON_TEXT_COLOR)}));
-        SDL_Rect dst = {
-            .x = 1500,
-            .y = 700,
-            .w = text->w,
-            .h = text->h
-        };
-        SDL_RenderCopy(renderer, check(SDL_CreateTextureFromSurface(renderer, text)), NULL, &dst);
+        widgetManager.draw(renderer);
         SDL_RenderPresent(renderer);
-        SDL_FreeSurface(text);
     }
     return 0;
 }

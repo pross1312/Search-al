@@ -41,10 +41,10 @@ void Grid::draw(SDL_Renderer* renderer) {
     for (size_t i = 0; i < MAXROWS; i++) {
         for (size_t j = 0; j < MAXCOLUMNS; j++) {
             const SDL_Rect rect {
-                .x = (int)(j * CELLSIZE + PADDING + position.x),
-                .y = (int)(i * CELLSIZE + PADDING + position.y),
-                .w = (int)(CELLSIZE - 2 * PADDING),
-                .h = (int)(CELLSIZE - 2 * PADDING),
+                .x = (int)(j * cellSize + PADDING + position.x),
+                .y = (int)(i * cellSize + PADDING + position.y),
+                .w = (int)(cellSize - 2 * PADDING),
+                .h = (int)(cellSize - 2 * PADDING),
             };
             check(SDL_SetRenderDrawColor(renderer, UNHEX(uint8_t, stateColor[at(i, j)])));
             check(SDL_RenderFillRect(renderer,
@@ -55,8 +55,8 @@ void Grid::draw(SDL_Renderer* renderer) {
 
 Vec2i Grid::pointToGridCell(Vec2i pos) {
     pos = pos - position;
-    pos.x /= CELLSIZE;
-    pos.y /= CELLSIZE;
+    pos.x /= cellSize;
+    pos.y /= cellSize;
     return pos;
 }
 
@@ -69,5 +69,19 @@ void Grid::clearPath() {
 void Grid::clear() {
     for (size_t i = 0; i < MAXROWS*MAXCOLUMNS; i++) {
         grid[i] = Walkable;
+    }
+}
+void Grid::setBound(SDL_Rect b) {
+    bound = b;
+    float temp_cell_w = b.w*1.0f / MAXCOLUMNS;
+    float temp_cell_h = b.h*1.0f / MAXROWS;
+    if (temp_cell_w < temp_cell_h) {
+        cellSize = size_t(temp_cell_w);
+        position.x = b.x;
+        position.y = b.y + b.h/2.0f - temp_cell_w*MAXROWS/2.0f;
+    } else {
+        cellSize = size_t(temp_cell_h);
+        position.x = b.x + b.w/2.0f - temp_cell_h*MAXCOLUMNS/2.0f;
+        position.y = b.y;
     }
 }
