@@ -47,10 +47,13 @@ int main(void) {
 
     auto grid = make_shared<Grid>(rows, columns);
 
-    auto widgetManager = make_shared<WidgetManager>((SDL_Rect){ .x = 0, .y = 0, .w = int(S_WIDTH), .h = int(S_HEIGHT) }, PortionHorizontal, std::vector<float>{.8f, .2f});
+    auto widgetManager = make_shared<WidgetManager>(
+            SDL_Rect{ .x = 0, .y = 0, .w = int(S_WIDTH), .h = int(S_HEIGHT) },
+            PortionHorizontal,
+            std::vector<float>{.8f, .2f});
     widgetManager->add(grid);
 
-    auto buttonsManager = make_shared<WidgetManager>(GridLayout, 5, 1);
+    auto buttonsManager = make_shared<WidgetManager>(GridLayout, 5, 2);
     widgetManager->add(buttonsManager);
 
     std::vector<shared_ptr<Button>> buttons {

@@ -8,6 +8,10 @@ class DFSFinder: public PathFinder {
 public:
     DFSFinder() = default;
     virtual inline void find(std::shared_ptr<Grid> g, Vec2i _start, Vec2i _end) override {
+        found = false;
+        trueFind(g, _start, _end);
+    }
+    inline void trueFind(std::shared_ptr<Grid> g, Vec2i _start, Vec2i _end) {
         if (_start == _end) {
             g->at(_start) = Corrected;
             found = true;
