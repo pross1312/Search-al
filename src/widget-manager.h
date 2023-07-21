@@ -2,6 +2,7 @@
 #include "widget.h"
 #include <assert.h>
 #include <vector>
+#include <memory>
 
 enum Layout {
     Vertical = 0,
@@ -33,13 +34,15 @@ public:
     // ~WidgetManager() { for (auto& widget : widgets) delete widget; }
     void draw(SDL_Renderer* renderer) override;
     void setBound(SDL_Rect b);
-    inline void add(Widget* widget) {
+    inline void add(std::shared_ptr<Widget> widget) {
+        assert(layout != GridLayout || widgets.size() < nRows*nCols);
+        assert(layout != PortionHorizontal || widgets.size() < portions.size());
         widgets.push_back(widget);
         update();
     }
     void update();
 private:
-    std::vector<Widget*> widgets;
+    std::vector<std::shared_ptr<Widget>> widgets;
     Layout layout;
     size_t nRows = 0, nCols = 0; // for Grid layout only
     std::vector<float> portions; // for portion layout only

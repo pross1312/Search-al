@@ -1,4 +1,5 @@
 #include "a-star.h"
+#include <memory>
 #include <algorithm>
 
 Vec2i directions[] = {
@@ -9,7 +10,7 @@ Vec2i directions[] = {
 };
 
 
-void AStarFinder::find(Grid* _grid, Vec2i _start, Vec2i _end) {
+void AStarFinder::find(std::shared_ptr<Grid> _grid, Vec2i _start, Vec2i _end) {
     this->grid   = _grid;
     this->start  = _start;
     this->goal   = _end;
@@ -68,5 +69,11 @@ void AStarFinder::addChildToFrontier(NodePtr parent) {
                 *checkNode = *childNode;
             }
         }
+    }
+}
+
+extern "C" {
+    std::shared_ptr<PathFinder> getObject(void) {
+        return std::make_shared<AStarFinder>();
     }
 }

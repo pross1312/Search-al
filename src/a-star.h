@@ -3,7 +3,6 @@
 #include <functional>
 #include <vector>
 #include <memory>
-
 class AStarFinder: public PathFinder {
 public:
     struct Node {
@@ -19,14 +18,14 @@ public:
 
     AStarFinder() = default;
 
-    virtual void find(Grid* g, Vec2i _start, Vec2i _end) override;
+    virtual void find(std::shared_ptr<Grid> g, Vec2i _start, Vec2i _end) override;
     NodePtr checkInFrontier(Vec2i nodePos);
     void addChildToFrontier(NodePtr parent);
     void markFoundPath(NodePtr goalNode);
 
 private:
     Frontier frontier;
-    Grid* grid         = nullptr;
+    std::shared_ptr<Grid> grid         = nullptr;
     Vec2i start;
     Vec2i goal;
 };

@@ -43,8 +43,8 @@ public:
 
     void setBound(SDL_Rect b) override;
 
-    inline State& at(Vec2i p)            { return grid[p.y * MAXCOLUMNS + p.x]; }
-    inline State& at(size_t r, size_t c) { return grid[r * MAXCOLUMNS + c]; }
+    inline State& at(Vec2i p)            { assert(isValidPosition(p)); return grid[p.y * MAXCOLUMNS + p.x]; }
+    inline State& at(size_t r, size_t c) { assert(isValidPosition(Vec2i(r, c))); return grid[r * MAXCOLUMNS + c]; }
     inline size_t pxWidth() const        { return MAXCOLUMNS * cellSize; }
     inline size_t pxHeight() const       { return MAXROWS * cellSize; }
 
