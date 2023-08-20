@@ -1,8 +1,9 @@
 #pragma once
-#include "texture.h"
 #include "widget.h"
 #include "vec2.h"
+#include "utils.h"
 #include <SDL2/SDL.h>
+#include <cassert>
 
 
 #define MAX_CELL_SIZE 32
@@ -15,21 +16,15 @@ enum State {
     StateCount,
 };
 
-inline const char* texturePath[StateCount] {
-    [Walkable] = "resources/Walkable.png",
-    [Unwalkable] = "resources/Unwalkable.png",
-    [Selected] = "resources/Selected.png",
-    [Corrected] = "resources/Corrected.png",
-};
-inline uint32_t stateColor[StateCount] {
-    [Walkable] = 0xaaaaaaff,
-    [Unwalkable] = 0x7f0000ff,
-    [Selected] = 0x22b14cff,
-    [Corrected] = 0x00a2e8ff,
-};
 
 class Grid: public Widget {
 public:
+    inline static uint32_t STATE_COLOR[StateCount] {
+        [Walkable] = 0xaaaaaaff,
+        [Unwalkable] = 0x7f0000ff,
+        [Selected] = 0x22b14cff,
+        [Corrected] = 0x00a2e8ff,
+    };
     Grid(size_t rows, size_t cols);
     ~Grid() { delete[] grid; };
 

@@ -46,7 +46,7 @@ void Grid::draw(SDL_Renderer* renderer) {
                 .w = (int)(cellSize - 2 * PADDING),
                 .h = (int)(cellSize - 2 * PADDING),
             };
-            check(SDL_SetRenderDrawColor(renderer, UNHEX(uint8_t, stateColor[at(i, j)])));
+            check(SDL_SetRenderDrawColor(renderer, UNHEX(uint8_t, STATE_COLOR[at(i, j)])));
             check(SDL_RenderFillRect(renderer,
                     &rect));
         }
