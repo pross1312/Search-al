@@ -1,5 +1,6 @@
-# A-star-visualization
-A simple implementation of A* algorithm. Visualize using sdl, sdl-ttf, sdl-image.
+# Search-al
+A simple searching algorithm visualization using SDL2.
+Using dll to inject new algorithm without recompilation.
 
 ## Dependencies
 * [sdl2](https://www.libsdl.org/)
