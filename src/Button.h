@@ -15,7 +15,7 @@ public:
     Button(const char* msg, TTF_Font* font, SDL_Renderer* renderer, std::function<void()> onClickedEvent);
     bool isInBound(Vec2i position);
     void draw(SDL_Renderer* renderer) override;
-    void setBound(SDL_Rect b) override;
+    void set_bound(SDL_Rect b) override;
     void update(SDL_Event& event, Vec2i mousePos);
 private:
     int padding = 10;

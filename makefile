@@ -2,7 +2,7 @@ CC=g++
 PKG=sdl2 SDL2_image SDL2_ttf
 CFLAGS=-Wall -Wextra -O1 -ggdb `pkg-config --cflags $(PKG)` -ldl
 LIBS=`pkg-config --libs $(PKG)`
-SRC=src/main.cpp src/Button.cpp src/Grid.cpp src/widget-manager.cpp
+SRC=src/main.cpp src/Button.cpp src/Grid.cpp src/layout.h
 
 all: search-algo/A-Star search-algo/DFS A_star
 

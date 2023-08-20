@@ -33,18 +33,18 @@ public:
     Grid(size_t rows, size_t cols);
     ~Grid() { delete[] grid; };
 
-    Vec2i pointToGridCell(Vec2i pos);
-    bool isValidPosition(Vec2i p) { return p.x >= 0 && p.y >= 0 && (size_t)p.x < MAXCOLUMNS && (size_t)p.y < MAXROWS; }
+    Vec2i point_to_cell(Vec2i pos);
+    bool is_valid_pos(Vec2i p) { return p.x >= 0 && p.y >= 0 && (size_t)p.x < MAXCOLUMNS && (size_t)p.y < MAXROWS; }
     void clear();
-    void clearPath();
+    void clear_path();
     void draw(SDL_Renderer* renderer) override;
-    void saveToFile(const char* fName);
-    void readFromFile(const char* fName);
+    void save(const char* fName);
+    void load(const char* fName);
 
-    void setBound(SDL_Rect b) override;
+    void set_bound(SDL_Rect b) override;
 
-    inline State& at(Vec2i p)            { assert(isValidPosition(p)); return grid[p.y * MAXCOLUMNS + p.x]; }
-    inline State& at(size_t r, size_t c) { assert(isValidPosition(Vec2i(r, c))); return grid[r * MAXCOLUMNS + c]; }
+    inline State& at(Vec2i p)            { assert(is_valid_pos(p)); return grid[p.y * MAXCOLUMNS + p.x]; }
+    inline State& at(size_t r, size_t c) { assert(is_valid_pos(Vec2i(r, c))); return grid[r * MAXCOLUMNS + c]; }
     inline size_t pxWidth() const        { return MAXCOLUMNS * cellSize; }
     inline size_t pxHeight() const       { return MAXROWS * cellSize; }
 

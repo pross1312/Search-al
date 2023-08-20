@@ -19,7 +19,7 @@ public:
         }
         g->at(_start) = Selected;
         for (auto& dir : directions) {
-            if (g->isValidPosition(_start + dir) && g->at(_start + dir) == Walkable) {
+            if (g->is_valid_pos(_start + dir) && g->at(_start + dir) == Walkable) {
                 find(g, _start+dir, _end);
                 if (found) {
                     g->at(_start) = Corrected;

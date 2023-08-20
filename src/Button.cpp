@@ -13,7 +13,7 @@ Button::Button(const char* msg, TTF_Font* font, SDL_Renderer* renderer, std::fun
         SDL_Surface* text = check(TTF_RenderText_Solid(font,  msg, SDL_Color{UNHEX(uint8_t, BUTTON_TEXT_COLOR)}));
         textBound.w = text->w;
         textBound.h = text->h;
-        setBound(SDL_Rect{ .x = 0, .y = 0, .w = text->w + 2*padding, .h = text->h + 2*padding });
+        set_bound(SDL_Rect{ .x = 0, .y = 0, .w = text->w + 2*padding, .h = text->h + 2*padding });
         texture = check(SDL_CreateTextureFromSurface(renderer, text));
         SDL_FreeSurface(text);
 }
@@ -26,7 +26,7 @@ Button::Button(const char* msg, TTF_Font* font, SDL_Renderer* renderer, int x, i
         SDL_Surface* text = check(TTF_RenderText_Solid(font,  msg, SDL_Color{UNHEX(uint8_t, BUTTON_TEXT_COLOR)}));
         textBound.w = text->w;
         textBound.h = text->h;
-        setBound(SDL_Rect{ .x = x, .y = y, .w = text->w + 2*padding, .h = text->h + 2*padding });
+        set_bound(SDL_Rect{ .x = x, .y = y, .w = text->w + 2*padding, .h = text->h + 2*padding });
 
         texture = check(SDL_CreateTextureFromSurface(renderer, text));
         SDL_FreeSurface(text);
@@ -65,7 +65,7 @@ void Button::update(SDL_Event& event, Vec2i mousePos) {
         currentColor = BUTTON_NORMAL_COLOR;
     }
 }
-void Button::setBound(SDL_Rect b) {
+void Button::set_bound(SDL_Rect b) {
     bound = b;
     padding = (b.w < b.h ? b.w : b.h)/10;
 }

@@ -6,7 +6,7 @@ Grid::Grid(size_t rows, size_t cols) : MAXROWS{ rows }, MAXCOLUMNS{ cols }, posi
     memset(grid, 0, MAXROWS * MAXCOLUMNS * sizeof(grid[0]));
 }
 
-void Grid::saveToFile(const char* fName) {
+void Grid::save(const char* fName) {
     std::ofstream fout(fName, std::ios::out);
     if (!fout)
         throw "Can't open file to save";
@@ -17,7 +17,7 @@ void Grid::saveToFile(const char* fName) {
     fout.close();
 }
 
-void Grid::readFromFile(const char* fName) {
+void Grid::load(const char* fName) {
     std::ifstream fin(fName, std::ios::in);
     if (!fin)
         throw "Can't open file to read";
@@ -53,14 +53,14 @@ void Grid::draw(SDL_Renderer* renderer) {
     }
 }
 
-Vec2i Grid::pointToGridCell(Vec2i pos) {
+Vec2i Grid::point_to_cell(Vec2i pos) {
     pos = pos - position;
     pos.x /= cellSize;
     pos.y /= cellSize;
     return pos;
 }
 
-void Grid::clearPath() {
+void Grid::clear_path() {
     for (size_t i = 0; i < MAXROWS*MAXCOLUMNS; i++) {
         if (grid[i] == Selected || grid[i] == Corrected) grid[i] = Walkable;
     }
@@ -71,7 +71,7 @@ void Grid::clear() {
         grid[i] = Walkable;
     }
 }
-void Grid::setBound(SDL_Rect b) {
+void Grid::set_bound(SDL_Rect b) {
     bound = b;
     float temp_cell_w = b.w*1.0f / MAXCOLUMNS;
     float temp_cell_h = b.h*1.0f / MAXROWS;

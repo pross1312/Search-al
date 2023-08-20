@@ -55,7 +55,7 @@ void AStarFinder::addChildToFrontier(NodePtr parent) {
     Vec2i center = parent->pos;
     for (auto dir : directions) {
         Vec2i childPos = center + dir;
-        if (grid->isValidPosition(childPos) && grid->at(childPos) == Walkable) { // explored can be checked with selected
+        if (grid->is_valid_pos(childPos) && grid->at(childPos) == Walkable) { // explored can be checked with selected
             NodePtr childNode = std::make_shared<Node>(Node{
                 .pos = childPos,
                 .pathCost = parent->pathCost + 1,

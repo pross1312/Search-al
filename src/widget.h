@@ -7,9 +7,8 @@ public:
     Widget(SDL_Rect b): bound(b) {}
     virtual void draw(SDL_Renderer* renderer) = 0;
     virtual ~Widget() = default;
-    virtual inline void setBound(SDL_Rect b) {
+    virtual void set_bound(SDL_Rect b) {
         bound = b;
     }
-protected:
     SDL_Rect bound;
 };
