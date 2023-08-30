@@ -73,7 +73,7 @@ void AStarFinder::addChildToFrontier(NodePtr parent) {
 }
 
 extern "C" {
-    std::shared_ptr<PathFinder> getObject(void) {
+    std::shared_ptr<PathFinder> get_object(void) {
         return std::make_shared<AStarFinder>();
     }
 }

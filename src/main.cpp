@@ -13,7 +13,7 @@ namespace fs = std::filesystem;
 
 // Vec2i startPos = { 0, 0 };
 // Vec2i endPos = { ROWS-5, COLUMNS-5 };
-
+#define GET_OBJECT_FUNCTION_NAME "get_object"
 using GetObjectFunction = shared_ptr<PathFinder> (*)(void);
 std::vector<void*> plugins;
 std::vector<shared_ptr<PathFinder>> finders;
@@ -67,11 +67,9 @@ int main(void) {
             std::initializer_list{0.8f, 0.2f});
     auto sub_layout  = make_shared<VerticalLayout>(VerticalLayout{0.1f, 0.9f});
     auto sub_layout1 = make_shared<HorizontalLayout>();
-    auto sub_layout2 = make_shared<VerticalLayout>();
     all_layout->add(grid);
     all_layout->add(sub_layout);
     sub_layout->add(sub_layout1);
-    sub_layout->add(sub_layout2);
 
     std::vector<shared_ptr<Button>> buttons {
         make_shared<Button>("Reset", font, renderer, [&]() { grid->clear(); dirty = false; }),
@@ -89,21 +87,24 @@ int main(void) {
             fprintf(stderr, "Can't load %s, ERROR: %s\n", path, dlerror());
             continue;
         }
-        GetObjectFunction getObject = (GetObjectFunction)dlsym(plugin, "getObject");
-        if (getObject == NULL) {
+        GetObjectFunction get_object = (GetObjectFunction)dlsym(plugin, GET_OBJECT_FUNCTION_NAME);
+        if (get_object == NULL) {
             fprintf(stderr, "Can't find getObject, ERROR: %s\n", dlerror());
             continue;
         }
         size_t index = finders.size();
         plugins.push_back(plugin);
-        finders.push_back(getObject());
-        buttons.push_back(make_shared<Button>(entry.path().filename().c_str(), font, renderer, [index, &grid, &dirty]() {
+        const auto& finder = get_object();
+        finders.push_back(finder);
+        buttons.push_back(make_shared<Button>(finder->name.c_str(), font, renderer, [index, &grid, &dirty]() {
             if (dirty) return;
             dirty = true;
             finders[index]->find(grid, Vec2i{0, 0}, Vec2i{(int)grid->MAXCOLUMNS-1, (int)grid->MAXROWS-1});
         }));
-        // close and free later
+        // close and free later or just leave it
     }
+    auto sub_layout2 = make_shared<GridLayout>(buttons.size() - 2 < 10 ? 5 : (buttons.size()-2)/2+1, 2);
+    sub_layout->add(sub_layout2);
     for (size_t i = 2; i < buttons.size(); i++) sub_layout2->add(buttons[i]);
 
     while (!quit) {
@@ -115,6 +116,9 @@ int main(void) {
             switch (event.type) {
             case SDL_QUIT:
                 quit = true;
+                break;
+            case SDL_KEYDOWN:
+                if (event.key.keysym.sym == SDLK_ESCAPE) quit = true;
                 break;
             case SDL_WINDOWEVENT:
                 if (event.window.event == SDL_WINDOWEVENT_RESIZED) {

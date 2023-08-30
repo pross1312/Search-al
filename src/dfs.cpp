@@ -6,7 +6,7 @@ inline Vec2i directions[] = {
 
 class DFSFinder: public PathFinder {
 public:
-    DFSFinder() = default;
+    DFSFinder(): PathFinder("DFS") {}
     virtual inline void find(std::shared_ptr<Grid> g, Vec2i _start, Vec2i _end) override {
         found = false;
         trueFind(g, _start, _end);
@@ -32,7 +32,7 @@ public:
 };
 
 extern "C" {
-    std::shared_ptr<PathFinder> getObject(void) {
+    std::shared_ptr<PathFinder> get_object(void) {
         return std::make_shared<DFSFinder>();
     }
 }

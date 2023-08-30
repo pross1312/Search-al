@@ -16,7 +16,7 @@ public:
     // using Frontier = std::priority_queue<NodePtr, std::vector<NodePtr>, std::function<bool(const NodePtr&, const NodePtr&)>>;
     using Frontier = std::vector<NodePtr>;
 
-    AStarFinder() = default;
+    AStarFinder(): PathFinder("A-star") {}
 
     virtual void find(std::shared_ptr<Grid> g, Vec2i _start, Vec2i _end) override;
     NodePtr checkInFrontier(Vec2i nodePos);
