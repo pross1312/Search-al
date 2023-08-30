@@ -7,9 +7,7 @@
 
 struct Layout: public Widget {
     Layout(std::string_view type): type(type), widgets(0) {}
-    Layout(std::string_view type, size_t nWidgets): type(type), widgets(nWidgets) {}
     Layout(SDL_Rect bound, std::string_view type): Widget(bound), type(type), widgets(0) {}
-    Layout(SDL_Rect bound, std::string_view type, size_t nWidgets): Widget(bound), type(type), widgets(nWidgets) {}
     virtual ~Layout() = default;
     virtual void update() = 0;
     inline SDL_Rect get_bound(size_t i) {
@@ -90,8 +88,8 @@ struct VerticalLayout: public Layout {
 };
 
 struct GridLayout: public Layout {
-    GridLayout(size_t rows, size_t cols): Layout("Grid", rows*cols), nRows(rows), nCols(cols) {}
-    GridLayout(SDL_Rect bound, size_t rows, size_t cols): Layout(bound, "Grid", rows*cols), nRows(rows), nCols(cols) {}
+    GridLayout(size_t rows, size_t cols): Layout("Grid"), nRows(rows), nCols(cols) {}
+    GridLayout(SDL_Rect bound, size_t rows, size_t cols): Layout(bound, "Grid"), nRows(rows), nCols(cols) {}
     inline void add(std::shared_ptr<Widget> widget) override {
         assert(widgets.size() < nRows*nCols && "Can't add more");
         widgets.push_back(widget);
