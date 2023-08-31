@@ -6,7 +6,7 @@ LIBS=`pkg-config --libs $(PKG)`
 HEADER=src/*.h
 SRC=src/main.cpp src/Button.cpp src/Grid.cpp src/text.cpp
 
-all: search-algo/A-Star search-algo/DFS search-al search-algo/BFS
+all: search-algo/A-Star search-algo/DFS search-al search-algo/BFS search-algo/Dijikstra
 
 search-algo/A-Star: src/a-star.cpp src/a-star.h
 	$(CC) -o search-algo/A-Star src/a-star.cpp $(ALGO_FLAGS)
@@ -16,6 +16,9 @@ search-algo/DFS: src/dfs.cpp
 
 search-algo/BFS: src/bfs.cpp
 	$(CC) -o search-algo/BFS src/bfs.cpp $(ALGO_FLAGS)
+
+search-algo/Dijikstra: src/dijikstra.cpp
+	$(CC) -o search-algo/Dijikstra src/dijikstra.cpp $(ALGO_FLAGS)
 
 search-al: $(SRC) $(HEADER)
 	$(CC) -o search-al $(SRC) $(CFLAGS) $(LIBS)
