@@ -18,7 +18,7 @@ public:
 
     AStarFinder(): PathFinder("A-star") {}
 
-    virtual void find(std::shared_ptr<Grid> g, Vec2i _start, Vec2i _end) override;
+    virtual float find(std::shared_ptr<Grid> g, Vec2i _start, Vec2i _end) override;
     NodePtr checkInFrontier(Vec2i nodePos);
     void addChildToFrontier(NodePtr parent);
     void markFoundPath(NodePtr goalNode);

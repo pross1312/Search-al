@@ -14,25 +14,27 @@ public:
     };
 
     BFSFinder(): PathFinder("BFS") {}
-    void find(std::shared_ptr<Grid> grid, Vec2i start, Vec2i end) override {
+    float find(std::shared_ptr<Grid> grid, Vec2i start, Vec2i end) override {
         std::list<std::shared_ptr<Node>> frontier;
         frontier.push_back(std::make_shared<Node>(start, nullptr));
         while (frontier.size() > 0) {
             auto node = frontier.front();
             frontier.pop_front();
-            if (node->pos == end) {
-                mark_path(grid, node);
-                return;
-            }
+            if (node->pos == end) return mark_path(grid, node);
             gen_children(&frontier, grid, node);
         }
+        return -1;
     }
 
-    void mark_path(std::shared_ptr<Grid> grid, std::shared_ptr<Node> cur) {
-        while (cur != nullptr) {
+    float mark_path(std::shared_ptr<Grid> grid, std::shared_ptr<Node> cur) {
+        float cost = 0;
+        while (true) {
             grid->at(cur->pos) = Corrected;
+            if (cur->parent) cost += cur->pos.getDistance(cur->parent->pos);
+            else return cost;
             cur = cur->parent;
         }
+        return -1;
     }
 
     void gen_children(std::list<std::shared_ptr<Node>>* frontier, std::shared_ptr<Grid> grid, std::shared_ptr<Node> cur) {

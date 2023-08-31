@@ -10,7 +10,7 @@ Vec2i directions[] = {
 };
 
 
-void AStarFinder::find(std::shared_ptr<Grid> _grid, Vec2i _start, Vec2i _end) {
+float AStarFinder::find(std::shared_ptr<Grid> _grid, Vec2i _start, Vec2i _end) {
     this->grid   = _grid;
     this->start  = _start;
     this->goal   = _end;
@@ -30,11 +30,12 @@ void AStarFinder::find(std::shared_ptr<Grid> _grid, Vec2i _start, Vec2i _end) {
         frontier.pop_back();
         if (top->pos == goal) {
             markFoundPath(top);
-            break;
+            return top->pathCost;
         }
         addChildToFrontier(top);
         std::sort(frontier.begin(), frontier.end(), [](auto a, auto b) { return *a > *b; });
     }
+    return -1;
 }
 
 void AStarFinder::markFoundPath(NodePtr goalNode) {
@@ -58,7 +59,7 @@ void AStarFinder::addChildToFrontier(NodePtr parent) {
         if (grid->is_valid_pos(childPos) && grid->at(childPos) == Walkable) { // explored can be checked with selected
             NodePtr childNode = std::make_shared<Node>(Node{
                 .pos = childPos,
-                .pathCost = parent->pathCost + 1,
+                .pathCost = parent->pathCost + parent->pos.getDistance(childPos),
                 .heuristic = childPos.getDistance(goal),
                 .parent = parent
             });

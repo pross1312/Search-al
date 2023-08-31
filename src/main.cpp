@@ -108,7 +108,9 @@ int main(void) {
         buttons.push_back(make_shared<Button>(finder->name.c_str(), font, renderer, [index, &grid, &dirty]() {
             if (dirty) return;
             dirty = true;
-            finders[index]->find(grid, Vec2i{0, 0}, Vec2i{(int)grid->MAXCOLUMNS-1, (int)grid->MAXROWS-1});
+            float cost = finders[index]->find(grid, Vec2i{0, 0}, Vec2i{(int)grid->MAXCOLUMNS-1, (int)grid->MAXROWS-1});
+            if (cost == -1) printf("%s can't find path\n", finders[index]->name.c_str());
+            else printf("%s found a path with cost: %.3f\n", finders[index]->name.c_str(), cost);
         }));
         // close and free later or just leave it
     }

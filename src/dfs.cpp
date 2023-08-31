@@ -7,27 +7,34 @@ inline Vec2i directions[] = {
 class DFSFinder: public PathFinder {
 public:
     DFSFinder(): PathFinder("DFS") {}
-    virtual inline void find(std::shared_ptr<Grid> g, Vec2i _start, Vec2i _end) override {
+    virtual inline float find(std::shared_ptr<Grid> g, Vec2i _start, Vec2i _end) override {
+        cost = 0;
         found = false;
         trueFind(g, _start, _end);
+        if (found) return cost;
+        return -1;
     }
-    inline void trueFind(std::shared_ptr<Grid> g, Vec2i _start, Vec2i _end) {
-        if (_start == _end) {
-            g->at(_start) = Corrected;
+    inline void trueFind(std::shared_ptr<Grid> g, Vec2i cur, Vec2i _end) {
+        if (cur == _end) {
+            g->at(cur) = Corrected;
             found = true;
             return;
         }
-        g->at(_start) = Selected;
+        g->at(cur) = Selected;
         for (auto& dir : directions) {
-            if (g->is_valid_pos(_start + dir) && g->at(_start + dir) == Walkable) {
-                find(g, _start+dir, _end);
+            Vec2i child_pos = cur + dir;
+            if (g->is_valid_pos(child_pos) && g->at(child_pos) == Walkable) {
+                cost += cur.getDistance(child_pos);
+                trueFind(g, child_pos, _end);
                 if (found) {
-                    g->at(_start) = Corrected;
+                    g->at(cur) = Corrected;
                     return;
                 }
+                cost -= cur.getDistance(child_pos);
             }
         }
     }
+    float cost;
     bool found = false;
 };
 
