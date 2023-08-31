@@ -1,16 +1,15 @@
 #include "Button.h"
 #include "utils.h"
 
-template<typename T>
-T* check(T* data);
-void check(int data);
-
 Button::Button(const char* msg, TTF_Font* font, SDL_Renderer* renderer, std::function<void()> onClickedEvent):
     text{ msg },
     currentColor{ BUTTON_NORMAL_COLOR },
     onClickedEvent{ onClickedEvent } {
         currentColor = BUTTON_NORMAL_COLOR;
-        SDL_Surface* text = check(TTF_RenderText_Solid(font,  msg, SDL_Color{UNHEX(uint8_t, BUTTON_TEXT_COLOR)}));
+        SDL_Surface* text = check(TTF_RenderText_Solid(
+                                    font,
+                                    msg,
+                                    SDL_Color{UNHEX(uint8_t, BUTTON_TEXT_COLOR)}));
         textBound.w = text->w;
         textBound.h = text->h;
         set_bound(SDL_Rect{ .x = 0, .y = 0, .w = text->w + 2*padding, .h = text->h + 2*padding });
@@ -23,7 +22,10 @@ Button::Button(const char* msg, TTF_Font* font, SDL_Renderer* renderer, int x, i
     currentColor{ BUTTON_NORMAL_COLOR },
     onClickedEvent{ onClickedEvent } {
         currentColor = BUTTON_NORMAL_COLOR;
-        SDL_Surface* text = check(TTF_RenderText_Solid(font,  msg, SDL_Color{UNHEX(uint8_t, BUTTON_TEXT_COLOR)}));
+        SDL_Surface* text = check(TTF_RenderText_Solid(
+                    font,
+                    msg,
+                    SDL_Color{UNHEX(uint8_t, BUTTON_TEXT_COLOR)}));
         textBound.w = text->w;
         textBound.h = text->h;
         set_bound(SDL_Rect{ .x = x, .y = y, .w = text->w + 2*padding, .h = text->h + 2*padding });

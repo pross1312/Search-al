@@ -12,6 +12,7 @@
 class Button: public Widget {
 public:
     Button(const char* msg, TTF_Font* font, SDL_Renderer* renderer, int x, int y, std::function<void()> onClickedEvent);
+    ~Button() { if (texture) SDL_DestroyTexture(texture); }
     Button(const char* msg, TTF_Font* font, SDL_Renderer* renderer, std::function<void()> onClickedEvent);
     bool isInBound(Vec2i position);
     void draw(SDL_Renderer* renderer) override;
