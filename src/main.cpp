@@ -1,7 +1,9 @@
 #include "Button.h"
+#include "PortionLayout.h"
+#include "FlowLayout.h"
+#include "GridLayout.h"
 #include "Grid.h"
 #include "Findpath.h"
-#include "layout.h"
 #include <filesystem>
 #include <dlfcn.h>
 
@@ -22,7 +24,7 @@ int main(void) {
     const int rows = 20;
     const int columns = 20;
     const char* searchAlgoPath = "search-algo/";
-    const char* fontPath       = "iosevka-term-regular.ttf";
+    const char* fontPath       = "JetBrainsMono-Regular.ttf";
 
     size_t S_WIDTH = 800;
     size_t S_HEIGHT = 700;
@@ -62,14 +64,18 @@ int main(void) {
  * ----------------------------------------------*
 */
 
-    auto all_layout = make_shared<HorizontalLayout>(
+    auto all_layout = make_shared<PortionLayout>(
+            PortionLayout::Type::Horizontal,
             SDL_Rect{ .x = 0, .y = 0, .w = int(S_WIDTH), .h = int(S_HEIGHT) },
             std::initializer_list{0.8f, 0.2f});
-    auto sub_layout  = make_shared<VerticalLayout>(VerticalLayout{0.1f, 0.9f});
-    auto sub_layout1 = make_shared<HorizontalLayout>();
+    auto sub_layout  = make_shared<PortionLayout>(
+            PortionLayout::Type::Vertical,
+            std::initializer_list{0.1f, 0.8f, 0.1f});
+    auto sub_layout1 = make_shared<FlowLayout>(
+            FlowLayout::Type::Horizontal);
     all_layout->add(grid);
     all_layout->add(sub_layout);
-    sub_layout->add(sub_layout1);
+    sub_layout->add(sub_layout1, 0);
 
     std::vector<shared_ptr<Button>> buttons {
         make_shared<Button>("Reset", font, renderer, [&]() { grid->clear(); dirty = false; }),
@@ -103,9 +109,11 @@ int main(void) {
         }));
         // close and free later or just leave it
     }
+
     auto sub_layout2 = make_shared<GridLayout>(buttons.size() - 2 < 10 ? 5 : (buttons.size()-2)/2+1, 2);
-    sub_layout->add(sub_layout2);
     for (size_t i = 2; i < buttons.size(); i++) sub_layout2->add(buttons[i]);
+
+    sub_layout->add(sub_layout2);
 
     while (!quit) {
         uint32_t start = SDL_GetTicks();
