@@ -17,8 +17,7 @@ enum State {
 };
 
 
-class Grid: public Widget {
-public:
+struct Grid: public Widget {
     inline static uint32_t STATE_COLOR[StateCount] {
         [Walkable] = 0xaaaaaaff,
         [Unwalkable] = 0x7f0000ff,
@@ -39,7 +38,7 @@ public:
     void set_bound(SDL_Rect b) override;
 
     inline State& at(Vec2i p)            { assert(is_valid_pos(p)); return grid[p.y * MAXCOLUMNS + p.x]; }
-    inline State& at(size_t r, size_t c) { assert(is_valid_pos(Vec2i(r, c))); return grid[r * MAXCOLUMNS + c]; }
+    inline State& at(size_t r, size_t c) { assert(is_valid_pos(Vec2i(c, r))); return grid[r * MAXCOLUMNS + c]; }
     inline size_t pxWidth() const        { return MAXCOLUMNS * cellSize; }
     inline size_t pxHeight() const       { return MAXROWS * cellSize; }
 
