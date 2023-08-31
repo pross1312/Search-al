@@ -1,4 +1,5 @@
 #include "Button.h"
+#include "text.h"
 #include "PortionLayout.h"
 #include "FlowLayout.h"
 #include "GridLayout.h"
@@ -73,9 +74,11 @@ int main(void) {
             std::initializer_list{0.1f, 0.8f, 0.1f});
     auto sub_layout1 = make_shared<FlowLayout>(
             FlowLayout::Type::Horizontal);
+    auto performance_text = make_shared<Text>("Checking", font, renderer, 0xffffffff, 0, 0);
     all_layout->add(grid);
     all_layout->add(sub_layout);
     sub_layout->add(sub_layout1, 0);
+    sub_layout->add(performance_text, 2);
 
     std::vector<shared_ptr<Button>> buttons {
         make_shared<Button>("Reset", font, renderer, [&]() { grid->clear(); dirty = false; }),
