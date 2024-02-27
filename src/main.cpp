@@ -105,12 +105,16 @@ int main(void) {
         plugins.push_back(plugin);
         const auto& finder = get_object();
         finders.push_back(finder);
-        buttons.push_back(make_shared<Button>(finder->name.c_str(), font, renderer, [index, &grid, &dirty]() {
+        buttons.push_back(make_shared<Button>(finder->name.c_str(), font, renderer, [&, renderer, index, performance_text]() {
             if (dirty) return;
             dirty = true;
             float cost = finders[index]->find(grid, Vec2i{0, 0}, Vec2i{(int)grid->MAXCOLUMNS-1, (int)grid->MAXROWS-1});
-            if (cost == -1) printf("%s can't find path\n", finders[index]->name.c_str());
-            else printf("%s found a path with cost: %.3f\n", finders[index]->name.c_str(), cost);
+            if (cost == -1) performance_text->set_text(renderer, "Not found");
+            else {
+                char text_buffer[16] {};
+                sprintf(text_buffer, "%.3f", cost);
+                performance_text->set_text(renderer, text_buffer);
+            }
         }));
         // close and free later or just leave it
     }
